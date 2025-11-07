@@ -93,6 +93,13 @@ git commit -m "mensagem" (Para Salvar o teu progresso local)
 
 git push origin <nome-branch> (Para Enviar o teu trabalho para o GitHub)
 
+
+
+
+
+
+
+
 duplas:
 
 
