@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "private": true,
-  "homepage": "https://marcsfic98.github.io/servicosja",
+  "homepage": "https://marcsfic98.github.io/servicosja/",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
