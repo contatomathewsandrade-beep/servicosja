@@ -6,92 +6,170 @@ Fala pessoal
 
 A main é a versão oficial e funcional do nosso projeto. Vocês vão trabalhar em uma "faixa de trabalho" (uma branch) separada de vocẽs mesmo e só é juntada à main depois de ser revisada e aprovada (através de um Pull Request - PR).
 
-Passo 0: Sincronizar (Antes de Começar)
+<h1>Git - Trabalhando com Fork no GitHub</h1>
 
-Antes de escrever qualquer código, garantam que voces estão na versão mais atualizadas do projeto.
 
-Comandos:
 
-1. Vai para a branch principal
-    git checkout main
-2. Puxa as atualizações mais recentes do GitHub
-    git pull origin main
+**Fork** é uma prática comum no GitHub para copiar um repositório de um outro usuário para o seu repositório no Github. Esta prática permite que você faça mudanças livremente sem afetar o repositório original. Este tutorial irá guiá-lo pelos passos para fazer um fork de um repositório, clonar o repositório "forkado", fazer mudanças e criar um pull request para contribuir de volta no repositório original.
 
-Passo 1: Criar a tua "Faixa de Trabalho" (A Branch)
+<br />
 
-Agora que está atualizado, cria a sua "faixa" para trabalhar isolado.
+**Clone x Fork**
 
-Comandos:
+A imagem abaixo, ilustra a diferença entre o Clone o Fork:
 
-1.Cria a tua branch E muda-te para ela de uma só vez
-    git checkout -b nome-da-tua-branch
+<div align="center"><img src="https://i.imgur.com/aqnalbT.png" title="source: imgur.com" /></div>
 
-2. Dica de Nomenclatura (IMPORTANTE):
+Quando você **clona** um repositório Git, você está baixando uma cópia do repositório para sua máquina local. É como pegar uma foto do momento do código do GitHub e fazer o download na máquina. 
 
-Do Back-end e a tarefa é o "login API": git checkout -b feature/backend/login-api
+Por outro lado, o **forking** é feito diretamente no GitHub. Quando você faz um fork de um repositório, você cria uma cópia do repositório original em sua conta do GitHub. Este repositório **"forkado"** permanece vinculado ao original, permitindo que você faça alterações e contribua de volta. No entanto, quaisquer alterações que você fizer no seu fork não afetarão automaticamente o repositório original — você precisará criar explicitamente uma solicitação de pull para mesclar suas alterações. 
 
-Do Front-end e a tarefa é a "página de login": git checkout -b feature/frontend/login-page
+<br />
 
-Passo 2: Trabalhar (Codificar e Salvar)
+<h2>👣 Passo 1: Fazer Fork do Repositório</h2>
 
-Comandos:
 
-1. (Opcional, mas recomendado) verifica o que foi modificado!
 
-git status
+1. **Acesse o Repositório Original**:
+   - Vá para o repositório que você deseja forkar no GitHub.
 
-2. adiciona as modificações ao "cesto de compras" para salvar
+<div align="center"><img src="https://i.imgur.com/17Ucb99.png" title="source: imgur.com" /></div>
 
-git add . 
-(O "." significa "todos os ficheiros que modifiquei nesta pasta")
+2. **Clique em "Fork"**:
+   - No canto superior direito da página do repositório, clique no menu **Fork 🡪 Create a new fork**.
 
-3. Salva o checkpoint com uma mensagem CLARA
+<div align="center"><img src="https://i.imgur.com/Iv99Sax.png" title="source: imgur.com" /></div>
 
-git commit -m "O que é que eu fiz nesta alteração?"
+3. Selecione a **Sua Conta**:
+   - Selecione sua conta GitHub onde o fork será criado. Isso criará uma cópia do repositório original na sua conta GitHub.
+   - Na sequência clique no botão **Create fork** para concluir.
 
-Exemplo de MÁ mensagem: git commit -m "coisas"
+<div align="center"><img src="https://i.imgur.com/cfBihTA.png" title="source: imgur.com" /></div>
 
-Exemplo de BOA mensagem: git commit -m "Adiciona validação de email no registo de cliente"
+<br />
 
-Passo 3: Enviar para o GitHub (Push)
+<h2>👣 Passo 2: Clonar o Repositório Fork</h2>
 
-Quando a tua tarefa estiver pronta, envia a tua branch (com todos os commits) para o GitHub.
 
-Comando:
 
-git push origin nome-da-tua-branch
+1. **Navegue até Seu Repositório Fork**:
+   - Vá para a página do repositório que você fez o fork no seu GitHub.
 
-(Dica: Na primeira vez que fizeres push, o Git pode sugerir um comando um pouco mais longo, como git push --set-upstream origin .... É só copiar e colar o que ele sugerir!)
+<div align="center"><img src="https://i.imgur.com/UZzuRHD.png" title="source: imgur.com" /></div>
 
-Passo 4: Pedir a Revisão (Pull Request - PR)
+2. **Copie a URL do Repositório**:
+   - Clique no botão **Code** e copie a URL HTTPS do repositório (usualmente termina com `.git`).
 
-Este é o passo final e crucial.
+<div align="center"><img src="https://i.imgur.com/R9HxgoJ.png" title="source: imgur.com" /></div>
 
-Vai ao site do GitHub.
+3. **Clone o Repositório para Seu Computador**:
 
-O GitHub vai mostrar uma barra amarela/verde sugerindo "Criar um Pull Request" para a branch que acabaste de enviar. Clica nela!
+   - Abra um terminal ou prompt de comando.
 
-Coloca um bom título, uma breve descrição e atribui um "Revisor".
 
-Passo 5: Repetir!
+   - Execute o comando:
 
-Se PR. Se estiver tudo bem, vai ser feito o "Merge" (juntar) o teu trabalho à main. Se houver ajustes, vão ser comentados na PR.
+     ```bash
+     git clone <URL-do-repositório>
+     ```
+     
+     Substitua a **<URL-do-repositório>** pela URL copiada.
 
-Assim que o PR for aprovado e "mergeado", a tarefa está feita! pode apagar a tua branch (o GitHub oferece um botão para isso) e voltar ao Passo 0 para a próxima tarefa!
+<br />
 
-Resumo dos 6 Comandos Essenciais (para imprimir)
+<h2>👣 Passo 3: Fazer Mudanças no Código</h2>
 
-git pull origin main (Para Atualizar antes de começar)
 
-git checkout -b <nome-branch> (Para Criar a tua faixa de trabalho)
 
-git status (Para Verificar o que fizeste)
+1. **Navegue para o Diretório do Repositório Clonado**:
 
-git add . (Para Preparar os ficheiros para salvar)
+   ```bash
+   cd <nome-do-repositório>
+   ```
+   
+2. **Crie uma Nova Branch**:
 
-git commit -m "mensagem" (Para Salvar o teu progresso local)
+   - É uma boa prática criar uma nova branch para suas mudanças.
 
-git push origin <nome-branch> (Para Enviar o teu trabalho para o GitHub)
+   ```bash
+   git checkout -b minha-branch
+   ```
+   
+3. **Faça Suas Mudanças**:
+
+   - Edite os arquivos conforme necessário.
+
+4. **Adicione e Comite Suas Mudanças**:
+
+   ```bash
+   git add .
+   git commit -m "Descrição das mudanças"
+   ```
+
+<br />
+
+<h2>👣 Passo 4: Enviar Mudanças para o GitHub</h2>
+
+
+
+1. Envie a nova Branch para o seu Repositório Fork:
+
+   ```bash
+   git push origin minha-branch
+   ```
+
+<br />
+
+<h2>👣 Passo 5: Criar um Pull Request</h2>
+
+
+
+1. **Navegue até o Repositório Fork no GitHub**.
+2. **Clique no Botão "Compare & pull request"**:
+   - Este botão aparece após você fazer push de uma nova branch.
+3. **Preencha os Detalhes do Pull Request**:
+   - Adicione um título e uma descrição detalhada do que foi alterado.
+4. **Submeta o Pull Request**:
+   - Clique no botão **"Create pull request"**.
+
+<br />
+
+<h2>👣 Passo 6: Manter seu Fork Atualizado</h2>
+
+
+
+1. **Adicione o Repositório Original como um Remoto**:
+
+   - No terminal, navegue até o diretório do repositório clonado e execute:
+
+   ```bash
+   git remote add upstream <URL-do-repositório-original>
+   ```
+   
+2. **Busque Atualizações do Repositório Original**:
+
+   ```bash
+   git fetch upstream
+   ```
+   
+3. **Mescle as Atualizações na Sua Branch**:
+
+   ```bash
+   git checkout main
+   git merge upstream/main
+   ```
+   
+4. **Envie as Atualizações para o seu repositório Fork no GitHub**:
+
+   ```bash
+   git push origin main
+   ```
+
+<br />
+
+<br />
+
+<div align="left"><a href="../README.md"><img src="https://i.imgur.com/XMgF3gl.png" title="source: imgur.com" width="3%"/>Voltar</a></div>
 
 
 
