@@ -13,6 +13,19 @@
     overflow: hidden;
 }
 
+.menuFilter{
+    width: 100%;
+    padding: 30px;
+    background-color: #fcfcfc;
+    position: absolute;
+    top:140px;
+    border-top: 2px solid var(--orange);
+    z-index: 5;
+    font-family: var(--font);
+    display: flex;
+    justify-content: space-around;
+}
+
 .servicesMenu a{
     color: var(--white);
     text-decoration: none;

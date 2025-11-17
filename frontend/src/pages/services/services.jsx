@@ -6,14 +6,21 @@ export default function Services () {
     return(
         <div className={styles.services}>
             <div className={styles.servicesMenu}> 
-                <a href="#">Beleza e Bem-estar</a>
-                <a href="#">Cuidado Pessoal</a>
-                <a href="#">Lazer e Eventos</a>
-                <a href="#">Limpeza e Organização</a> 
-                <a href="#">Manutenção e Reparos</a>
-                <a href="#">Reforma e Construção</a>
-                <a href="#">Suluções Profissionais</a>
-                <a href="#">Transporte</a> 
+                <a id='beleza' href="#">Beleza e Bem-estar</a>
+                <a id='cuidado' href="#">Cuidado Pessoal</a>
+                <a id='lazer' href="#">Lazer e Eventos</a>
+                <a id='limpeza' href="#">Limpeza e Organização</a> 
+                <a id='manutencao' href="#">Manutenção e Reparos</a>
+                <a id='reforma' href="#">Reforma e Construção</a>
+                <a id='solucoes' href="#">Suluções Profissionais</a>
+                <a id='transporte' href="#">Transporte</a> 
+            </div>
+
+            <div className={styles.menuFilter}>
+                <p>ola</p>
+                <p>ola</p>
+                <p>ola</p>
+                <p>ola</p>  
             </div>
 
 
