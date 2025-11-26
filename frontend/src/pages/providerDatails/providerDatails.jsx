@@ -2,8 +2,8 @@ import {useState} from 'react';
 
 import styles from './providerDatails.module.css';
 import {FaUserCircle} from 'react-icons/fa';
-import ProviderBox from '../../components/ProviderBox/ProviderBox';
-import ProviderContactPopup from '../../components/providerContactPopup/providerContactPopup';
+import ProviderBox from '../../components/providerBox/providerBox.jsx';
+import ProviderContactPopup from '../../components/providerContactPopup/providerContactPopup.jsx';
 
 export default function ProviderDatails () {
 
