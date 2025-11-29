@@ -235,7 +235,7 @@ export default function ProviderRegistration() {
 
     const { register, loading } = ProviderServices();
 
-    console.log(formDataProvider);
+  
 
     // Variável para garantir que o select de serviço exiba o valor correto após a seleção
     // AJUSTE NA PROPRIEDADE: Agora buscamos o 'value' do serviço diretamente pelo ID salvo em formDataProvider.servico

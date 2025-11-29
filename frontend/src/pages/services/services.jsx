@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ProviderBox from '../../components/providerBox/providerBox';
 import styles from './services.module.css'
 import { FaSearch ,FaStar } from "react-icons/fa";
+import ProviderServices from '../../services/provider';
+import Loading from '../loading/loading';
 
 export default function Services () {
     const [activeMenuId, setActiveMenuId] = useState(null);
@@ -162,6 +164,25 @@ export default function Services () {
 
     const activeMenuItem = menuData.find(item => item.id === activeMenuId);
 
+    const {getProviders , providers , refetchProviders , loading} = ProviderServices()
+
+    useEffect (()=>{
+        if(refetchProviders){
+            getProviders()
+            
+        }
+    },[refetchProviders])
+
+    if(loading){
+        return(
+            <Loading/>
+        )
+    }
+
+    console.log(providers)
+
+    
+
     return(
         <div className={styles.services}>
           
@@ -231,9 +252,11 @@ export default function Services () {
                 </div>
 
                 <section className={styles.providerContainer}>
-                    {[...Array(18)].map((_, index) => (
-                        <ProviderBox name={"Aline Souza"} location={'Recife, Boa Vigem'} rating={4.9} resum={'Trancista. Especialista em tranças e penteados afro. Atendimento em domicílio.'} key={index} />
+
+                    {providers.map((provider)=> (
+                        <ProviderBox name={provider.nome} location={`${provider.cidade}, ${provider.bairro}`} rating={4.9} resum={'Trancista. Especialista em tranças e penteados afro. Atendimento em domicílio.'} key={provider.id} />
                     ))}
+                   
                 </section>
             </div>
         </div>
