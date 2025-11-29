@@ -1,35 +1,215 @@
 import { useState } from 'react';
 import { IMaskInput } from 'react-imask';
 import styles from './Registration.module.css';
+import ProviderServices from '../../services/provider';
+import Loading from '../loading/loading';
+
+const allServices = [
+    { "id": 1, "nome": "Alongamento de unha", "value": "alongamento-unha", "categoria": "beleza-bem-estar" },
+    { "id": 2, "nome": "Depilador/Epilador(a)", "value": "depilador", "categoria": "beleza-bem-estar" },
+    { "id": 3, "nome": "Manicure/Pedicure", "value": "manicure", "categoria": "beleza-bem-estar" },
+    { "id": 4, "nome": "Alongamento de cílios", "value": "alongamento-cilios", "categoria": "beleza-bem-estar" },
+    { "id": 5, "nome": "Especialista em megahair", "value": "megahair", "categoria": "beleza-bem-estar" },
+    { "id": 6, "nome": "Massagista", "value": "massagista", "categoria": "beleza-bem-estar" },
+    { "id": 7, "nome": "Barbeiro(a)", "value": "barbeiro", "categoria": "beleza-bem-estar" },
+    { "id": 8, "nome": "Micropigmentador(a)", "value": "micropigmentador", "categoria": "beleza-bem-estar" },
+    { "id": 9, "nome": "Cabeleireiro(a)", "value": "cabeleireiro", "categoria": "beleza-bem-estar" },
+    { "id": 10, "nome": "Especialista em penteados", "value": "penteados", "categoria": "beleza-bem-estar" },
+    { "id": 11, "nome": "Podólogo", "value": "podogolo", "categoria": "beleza-bem-estar" },
+    { "id": 12, "nome": "Colourista", "value": "colourista", "categoria": "beleza-bem-estar" },
+    { "id": 13, "nome": "Esteticista", "value": "esteticista", "categoria": "beleza-bem-estar" },
+    { "id": 14, "nome": "Trancista", "value": "trancista", "categoria": "beleza-bem-estar" },
+    { "id": 15, "nome": "Designer de sobrancelhas", "value": "designer-sobrancelha", "categoria": "beleza-bem-estar" },
+    { "id": 16, "nome": "Lash designer", "value": "lash-designer", "categoria": "beleza-bem-estar" },
+    { "id": 17, "nome": "Visagista", "value": "visagista", "categoria": "beleza-bem-estar" },
+    { "id": 18, "nome": "Maquiador(a)", "value": "maquiador", "categoria": "beleza-bem-estar" },
+
+    { "id": 19, "nome": "Acupunturista", "value": "acupunturista", "categoria": "cuidado-pessoal" },
+    { "id": 20, "nome": "Fisioterapeuta domiciliar", "value": "fisioterapeuta-domiciliar", "categoria": "cuidado-pessoal" },
+    { "id": 21, "nome": "Aromaterapeuta", "value": "aromaterapeuta", "categoria": "cuidado-pessoal" },
+    { "id": 22, "nome": "Personal trainer", "value": "personal-trainer", "categoria": "cuidado-pessoal" },
+    { "id": 23, "nome": "Auriculoterapeuta", "value": "auriculoterapeuta", "categoria": "cuidado-pessoal" },
+    { "id": 24, "nome": "Quiropraxista", "value": "quiropraxista", "categoria": "cuidado-pessoal" },
+    { "id": 25, "nome": "Cuidador(a) de idosos", "value": "cuidador-idosos", "categoria": "cuidado-pessoal" },
+    { "id": 26, "nome": "Ventosaterapeuta", "value": "ventosaterapeuta", "categoria": "cuidado-pessoal" },
+    { "id": 27, "nome": "Enfermeiro(a) particular", "value": "enfermeiro-particular", "categoria": "cuidado-pessoal" },
+
+    { "id": 28, "nome": "Aluguel de brinquedos", "value": "aluguel-brinquedos", "categoria": "lazer-eventos" },
+    { "id": 29, "nome": "Decorador de festas", "value": "decorador-festas", "categoria": "lazer-eventos" },
+    { "id": 30, "nome": "Aluguel de equi. eletrônicos", "value": "aluguel-eletronicos", "categoria": "lazer-eventos" },
+    { "id": 31, "nome": "DJ/Músico", "value": "dj-musico", "categoria": "lazer-eventos" },
+    { "id": 32, "nome": "Fotógrafo", "value": "fotografo", "categoria": "lazer-eventos" },
+    { "id": 33, "nome": "Aluguel de mesas e cadeiras", "value": "aluguel-mesas-cadeiras", "categoria": "lazer-eventos" },
+    { "id": 34, "nome": "Garçom/Barman", "value": "garcom-barman", "categoria": "lazer-eventos" },
+    { "id": 35, "nome": "Aluguel de fantasias", "value": "aluguel-fantasias", "categoria": "lazer-eventos" },
+    { "id": 36, "nome": "Montador de eventos", "value": "montador-eventos", "categoria": "lazer-eventos" },
+    { "id": 37, "nome": "Animador/palhaço", "value": "animador-palhaco", "categoria": "lazer-eventos" },
+    { "id": 38, "nome": "Sonoplastia/Téc. de som", "value": "sonoplastia", "categoria": "lazer-eventos" },
+    { "id": 39, "nome": "Buffet", "value": "buffet", "categoria": "lazer-eventos" },
+
+    { "id": 40, "nome": "Dedetizador", "value": "dedetizador", "categoria": "limpeza-organizacao" },
+    { "id": 41, "nome": "Limpeza de estofados e colchões", "value": "limpeza-estofados-colchoes", "categoria": "limpeza-organizacao" },
+    { "id": 42, "nome": "Diarista", "value": "diarista", "categoria": "limpeza-organizacao" },
+    { "id": 43, "nome": "Enceramento de pisos", "value": "enceramento-pisos", "categoria": "limpeza-organizacao" },
+    { "id": 44, "nome": "Limpeza pós-obra", "value": "limpeza-pos-obra", "categoria": "limpeza-organizacao" },
+    { "id": 45, "nome": "Limpeza de ar-condicionado", "value": "limpeza-ar-condicionado", "categoria": "limpeza-organizacao" },
+    { "id": 46, "nome": "Limpeza de telhado", "value": "limpeza-telhado", "categoria": "limpeza-organizacao" },
+    { "id": 47, "nome": "Limpeza de caixa d'água", "value": "limpeza-caixa-dagua", "categoria": "limpeza-organizacao" },
+    { "id": 48, "nome": "Limpeza de vidro", "value": "limpeza-vidro", "categoria": "limpeza-organizacao" },
+    { "id": 49, "nome": "Limpeza de carpete", "value": "limpeza-carpete", "categoria": "limpeza-organizacao" },
+    { "id": 50, "nome": "Tratamento de pragas", "value": "tratamento-pragas", "categoria": "limpeza-organizacao" },
+    { "id": 51, "nome": "Zelador", "value": "zelador", "categoria": "limpeza-organizacao" },
+
+    { "id": 52, "nome": "Borracheiro", "value": "borracheiro", "categoria": "manutencao-reparos" },
+    { "id": 53, "nome": "Eletricista", "value": "eletricista", "categoria": "manutencao-reparos" },
+    { "id": 54, "nome": "Instalação de bomba e caixa d'água", "value": "instalacao-bomba-caixa", "categoria": "manutencao-reparos" },
+    { "id": 55, "nome": "Chaveiro", "value": "chaveiro", "categoria": "manutencao-reparos" },
+    { "id": 56, "nome": "Encanador", "value": "encanador", "categoria": "manutencao-reparos" },
+    { "id": 57, "nome": "Conserto de armários", "value": "conserto-armarios", "categoria": "manutencao-reparos" },
+    { "id": 58, "nome": "Envernizador de móveis", "value": "envernizador-moveis", "categoria": "manutencao-reparos" },
+    { "id": 59, "nome": "Manutenção de ventilador", "value": "manutencao-ventilador", "categoria": "manutencao-reparos" },
+    { "id": 60, "nome": "Conserto de eletrodomésticos", "value": "conserto-eletrodomesticos", "categoria": "manutencao-reparos" },
+    { "id": 61, "nome": "Instalação de ar-condicionado", "value": "instalacao-ar-condicionado", "categoria": "manutencao-reparos" },
+    { "id": 62, "nome": "Marceneiro", "value": "marceneiro", "categoria": "manutencao-reparos" },
+    { "id": 63, "nome": "Mecânico", "value": "mecanico", "categoria": "manutencao-reparos" },
+    { "id": 64, "nome": "Conserto de fogões e fornos", "value": "conserto-fogao-forno", "categoria": "manutencao-reparos" },
+    { "id": 65, "nome": "Instalação de câmeras", "value": "instalacao-cameras", "categoria": "manutencao-reparos" },
+    { "id": 66, "nome": "Montador de móveis", "value": "montador-moveis", "categoria": "manutencao-reparos" },
+    { "id": 67, "nome": "Instalação de TV e Home theater", "value": "instalacao-tv-hometheater", "categoria": "manutencao-reparos" },
+    { "id": 68, "nome": "Pintor", "value": "pintor", "categoria": "manutencao-reparos" },
+    { "id": 69, "nome": "Conserto de máquina de lavar", "value": "conserto-maquina-lavar", "categoria": "manutencao-reparos" },
+    { "id": 70, "nome": "Téc. em refrigeração", "value": "tec-refrigeracao", "categoria": "manutencao-reparos" },
+    { "id": 71, "nome": "Vedação", "value": "vedacao", "categoria": "manutencao-reparos" },
+
+    { "id": 72, "nome": "Aplicação de massa corrida", "value": "aplicacao-massa-corrida", "categoria": "reforma-construcao" },
+    { "id": 73, "nome": "Instalação de bancadas e pias", "value": "instalacao-bancadas-pias", "categoria": "reforma-construcao" },
+    { "id": 74, "nome": "Azulejista", "value": "azulejista", "categoria": "reforma-construcao" },
+    { "id": 75, "nome": "Instalação de Drywall", "value": "instalacao-drywall", "categoria": "reforma-construcao" },
+    { "id": 76, "nome": "Calheiro", "value": "calheiro", "categoria": "reforma-construcao" },
+    { "id": 77, "nome": "Instalação de portas e janelas", "value": "instalacao-portas-janelas", "categoria": "reforma-construcao" },
+    { "id": 78, "nome": "Colocação de forro de PVC", "value": "colocacao-forro-pvc", "categoria": "reforma-construcao" },
+    { "id": 79, "nome": "Instalação de telhados", "value": "instalacao-telhados", "categoria": "reforma-construcao" },
+    { "id": 80, "nome": "Fundação e alvenaria", "value": "fundacao-alvenaria", "categoria": "reforma-construcao" },
+    { "id": 81, "nome": "Pedreiro", "value": "pedreiro", "categoria": "reforma-construcao" },
+    { "id": 82, "nome": "Gesseiro", "value": "gesseiro", "categoria": "reforma-construcao" },
+    { "id": 83, "nome": "Reforma de fachadas", "value": "reforma-fachadas", "categoria": "reforma-construcao" },
+    { "id": 84, "nome": "Impermeabilização de lajes e paredes", "value": "impermeabilizacao-lajes-paredes", "categoria": "reforma-construcao" },
+    { "id": 85, "nome": "Reforma de pisos", "value": "reforma-pisos", "categoria": "reforma-construcao" },
+
+    { "id": 86, "nome": "Consultor de marketing", "value": "consultor-marketing", "categoria": "solucoes-profissionais" },
+    { "id": 87, "nome": "Professor profisional", "value": "professor", "categoria": "solucoes-profissionais" },
+    { "id": 88, "nome": "Designer Gráfico", "value": "design-grafico", "categoria": "solucoes-profissionais" },
+    { "id": 89, "nome": "Redator/Tradutor", "value": "tradutor", "categoria": "solucoes-profissionais" },
+    { "id": 90, "nome": "Editor de vídeo", "value": "editor-video", "categoria": "solucoes-profissionais" },
+    { "id": 91, "nome": "Téc. de informática e celular", "value": "tec-informatica", "categoria": "solucoes-profissionais" },
+    { "id": 92, "nome": "Social media", "value": "social-media", "categoria": "solucoes-profissionais" },
+    { "id": 93, "nome": "Web designer", "value": "web-designer", "categoria": "solucoes-profissionais" },
+    { "id": 94, "nome": "Ilustrador digital", "value": "ilustrador-digital", "categoria": "solucoes-profissionais" },
+
+    { "id": 95, "nome": "Aluguel de caminhão", "value": "caminhao", "categoria": "transporte" },
+    { "id": 96, "nome": "Moto-boy", "value": "motoboy", "categoria": "transporte" },
+    { "id": 97, "nome": "Aluguel de carro/van", "value": "carro", "categoria": "transporte" },
+    { "id": 98, "nome": "Mudança comercial", "value": "mudanca-comercio", "categoria": "transporte" },
+    { "id": 99, "nome": "Frete", "value": "frete", "categoria": "transporte" },
+    { "id": 100, "nome": "Mudança residencial", "value": "mudanca-residencia", "categoria": "transporte" },
+    { "id": 101, "nome": "Guincho", "value": "guincho", "categoria": "transporte" },
+    { "id": 102, "nome": "Transporte de animais", "value": "animais", "categoria": "transporte" }
+];
+
+const serviceIdMap = allServices.reduce((acc, service) => {
+    acc[service.value] = service.id;
+    return acc;
+}, {});
+
+// Função auxiliar para remover todos os caracteres não numéricos
+const cleanNonNumeric = (value) => {
+    return value ? value.replace(/[^0-9]/g, '') : '';
+};
+
+// Função auxiliar para converter DD/MM/AAAA para AAAA-MM-DD
+const formatDateToISO = (dateStr) => {
+    if (!dateStr || dateStr.length !== 10) return dateStr;
+    const [day, month, year] = dateStr.split('/');
+    if (day && month && year) {
+        return `${year}-${month}-${day}`;
+    }
+    return dateStr;
+};
+
+// Função auxiliar para filtrar os serviços pela categoria
+const getServicesByCategory = (category) => {
+    return allServices.filter(service => service.categoria === category);
+};
+
+// ----------------------------------------------------------------------
 
 export default function ProviderRegistration() {
     const [categoria, setCategoria] = useState('');
-    const [formDataProvider, setFormDataProvider] = useState({});
- 
-    const caseSensitiveFields = ['password', 'confirmPassword'];
+    const [formDataProvider, setFormDataProvider] = useState({ servicos: [] });
+
+    const caseSensitiveFields = ['password', 'password2'];
 
     const handleChangeSetDataProvider = (e) => {
         const { name, value } = e.target;
-
-        const newValue = caseSensitiveFields.includes(name)
+        
+        // 1. Tratamento de Case Sensitive e Lowercase
+        const lowerCasedValue = caseSensitiveFields.includes(name)
             ? value
             : (typeof value === 'string' ? value.toLowerCase() : value);
+        
+        let finalValueToSave = lowerCasedValue;
 
-        if (name === 'categoria') {
-            setCategoria(newValue);
-            setFormDataProvider(prevData => ({
-                ...prevData,
-                [name]: newValue,
-                'servico': ''
-            }));
-        } else {
-            setFormDataProvider(prevData => ({
-                ...prevData,
-                [name]: newValue
-            }));
+        // 2. Remoção de Máscara e Formatação para API (Executado antes da lógica especial)
+        if (name === 'cpf' || name === 'cep' || name === 'telefone_publico') {
+            finalValueToSave = cleanNonNumeric(lowerCasedValue);
+        } else if (name === 'dt_nascimento') {
+            finalValueToSave = formatDateToISO(lowerCasedValue); 
         }
+
+        // 3. Lógica Especial para Categoria e Serviço
+        if (name === 'categoria') {
+            // Salva a categoria no estado local e no formulário, e limpa o serviço
+            setCategoria(lowerCasedValue);
+            setFormDataProvider(prevData => ({
+                ...prevData,
+                [name]: lowerCasedValue, 
+                'servicos': [] 
+            }));
+            return; 
+            
+        } else if (name === 'servicos') {
+            // Salva o ID do serviço como um array [id]
+            const selectedId = serviceIdMap[lowerCasedValue];
+            
+            setFormDataProvider(prevData => ({
+                ...prevData,
+                [name]: selectedId !== undefined ? [selectedId] : []
+            }));
+            return; 
+        } 
+        
+        // 4. Tratamento Genérico para os demais campos (Rua, Número, Email, Senhas, etc.)
+        setFormDataProvider(prevData => ({
+            ...prevData,
+            [name]: finalValueToSave // Usa o valor limpo/formatado/lowercase
+        }));
     };
 
+    const {register ,loading } = ProviderServices();
+
+    console.log(formDataProvider);
+
+    // Variável para garantir que o select de serviço exiba o valor correto após a seleção
+    const selectedServiceValue = formDataProvider.servicos && formDataProvider.servicos.length > 0
+        ? allServices.find(s => s.id === formDataProvider.servicos[0])?.value || ''
+        : '';
+
+        if(loading){
+            return(
+                <Loading/>
+            )
+        }
+    
     return (
         <div className={styles.userRegistrationContainer}>
             <div className={styles.registrationForm}>
@@ -39,7 +219,7 @@ export default function ProviderRegistration() {
                     <input
                         type="text"
                         placeholder="Nome Completo"
-                        name='name'
+                        name='nome_completo'
                         onChange={handleChangeSetDataProvider}
                         required
                     />
@@ -50,13 +230,15 @@ export default function ProviderRegistration() {
                             name='cpf'
                             placeholder='Cpf'
                             type="text"
+                            // Controla o valor do IMaskInput para exibição formatada
+                            value={formDataProvider.cpf || ''} 
                             onChange={handleChangeSetDataProvider}
                             required
                         />
 
                         <IMaskInput
                             mask="00/00/0000"
-                            name='dataNascimento'
+                            name='dt_nascimento'
                             placeholder='Data de nascimento'
                             onChange={handleChangeSetDataProvider}
                             type="text"
@@ -72,9 +254,9 @@ export default function ProviderRegistration() {
                         required
                     >
                         <option value="" disabled hidden>Sexo</option>
-                        <option value="masculino">Masculino</option>
-                        <option value="feminino">Feminino</option>
-                        <option value="transgenero">Transgênero</option>
+                        <option value="m">Masculino</option>
+                        <option value="f">Feminino</option>
+                        <option value="t">Transgênero</option>
                         <option value="nao-binario">Não-binário</option>
                         <option value="nao-informado">Prefiro não informar</option>
                     </select>
@@ -92,17 +274,17 @@ export default function ProviderRegistration() {
                         <input
                             type="number"
                             placeholder='Numero'
-                            name='number'
-                            value={formDataProvider.number || ''}
+                            name='numero_casa'
+                            value={formDataProvider.numero_casa || ''}
                             onChange={handleChangeSetDataProvider}
                             required
                         />
-
                     </div>
 
                     <IMaskInput
                         mask="00000-000"
                         name='cep'
+                        value={formDataProvider.cep || ''}
                         onChange={handleChangeSetDataProvider}
                         placeholder='Cep'
                         type="text"
@@ -111,9 +293,10 @@ export default function ProviderRegistration() {
 
                     <IMaskInput
                         mask={['(00) 0000-0000', '(00) 00000-0000']}
-                        name='telefone'
-                        placeholder='Telefone'
+                        name='telefone_publico'
+                        value={formDataProvider.telefone_publico || ''}
                         onChange={handleChangeSetDataProvider}
+                        placeholder='Telefone'
                         type="tel"
                         required
                     />
@@ -138,167 +321,26 @@ export default function ProviderRegistration() {
                         </select>
 
                         <select
-                            id="servico"
-                            name='servico'
-                            value={formDataProvider.servico || ''}
+                            id="servicos"
+                            name='servicos'
+                            value={selectedServiceValue} 
                             onChange={handleChangeSetDataProvider}
                             required
+                            disabled={categoria === ''}
                         >
                             <option value="" disabled hidden>Serviço</option>
                             {categoria === '' && (
                                 <option value="" disabled>Selecione uma categoria</option>
-                            )
-                            }
-
-                            {categoria === 'beleza-bem-estar' && (
-                                <>
-                                    <option value="" disabled hidden>Serviço</option>
-                                    <option value="alongamento-unha">Alongamento de unha</option>
-                                    <option value="depilador">Depilador/Epilador(a)</option>
-                                    <option value="manicure">Manicure/Pedicure</option>
-                                    <option value="alongamento-cilios">Alongamento de cílios</option>
-                                    <option value="megahair">Especialista em Megahair</option>
-                                    <option value="massagista">Massagista</option>
-                                    <option value="barbeiro">Barbeiro(a)</option>
-                                    <option value="cabeleireiro">Cabeleireiro(a)</option>
-                                    <option value="micropigmentador">Micropigmentador(a)</option>
-                                    <option value="penteados">Especialista em penteados</option>
-                                    <option value="podogolo">Podógolo</option>
-                                    <option value="colourista">Colourista</option>
-                                    <option value="esteticista">Esteticista</option>
-                                    <option value="visagista">Visagista</option>
-                                    <option value="trancista">Trancista</option>
-                                    <option value="designer-sobrancelha">Designer de sobrancelha</option>
-                                    <option value="lash-designer">Lash Designer </option>
-                                    <option value="maquiador">Maquiador(a)</option>
-                                </>
                             )}
 
-                            {categoria === 'transporte' && (
-                                <>
-                                    <option value="" disabled hidden>Serviço</option>
-                                    <option value="caminhao">Aluguel de caminhão</option>
-                                    <option value="frete">Serviço de frete</option>
-                                    <option value="motoboy">Motoboy</option>
-                                    <option value="carro">Aluguel de carro/van</option>
-                                    <option value="mudanca-comercio">Mudança comercial</option>
-                                    <option value="mudanca-residencia">Mudança residêncial</option>
-                                    <option value="guincho">Guincho</option>
-                                    <option value="animais">Transporte de animais</option>
-                                </>
-                            )}
-
-                            {categoria === 'solucoes-profissionais' && (
-                                <>
-                                    <option value="" disabled hidden>Serviço</option>
-                                    <option value="professor">Professor</option>
-                                    <option value="tradutor">Redator/Tradutor</option>
-                                    <option value="design-grafico">Design gráfico</option>
-                                    <option value="desenvolvimento-web">Desenvolvimento web</option>
-                                    <option value="editor-video">Editor de vídeo</option>
-                                    <option value="tec-informatica">Tec. informatica/celular</option>
-                                    <option value="social-media">Social media</option>
-                                    <option value="web-designer">Web designer</option>
-                                    <option value="ilustrador-digital">Ilustrador digital</option>
-                                </>
-                            )}
-
-                            {categoria === 'manutencao-reparos' && (
-                                <>
-                                    <option value="" disabled hidden>Serviço</option>
-                                    <option value="borracheiro">Borracheiro</option>
-                                    <option value="eletricista">Eletricista</option>
-                                    <option value="instalacao-bomba-caixa">Instalação de bomba e caixa d'água</option>
-                                    <option value="chaveiro">Chaveiro</option>
-                                    <option value="encanador">Encanador</option>
-                                    <option value="conserto-armarios">Conserto de armários</option>
-                                    <option value="envernizador-moveis">Envernizador de móveis</option>
-                                    <option value="manutencao-ventilador">Manutenção de ventilador</option>
-                                    <option value="conserto-eletrodomesticos">Conserto de eletrodomésticos</option>
-                                    <option value="instalacao-ar-condicionado">Instalação de ar-condicionado</option>
-                                    <option value="marceneiro">Marceneiro</option>
-                                    <option value="mecanico">Mecânico</option>
-                                    <option value="conserto-fogao-forno">Conserto de fogões e fornos</option>
-                                    <option value="instalacao-cameras">Instalação de câmeras</option>
-                                    <option value="montador-moveis">Montador de móveis</option>
-                                    <option value="instalacao-tv-hometheater">Instalação de TV e Home theater</option>
-                                    <option value="pintor">Pintor</option>
-                                    <option value="conserto-maquina-lavar">Conserto de máquina de lavar</option>
-                                    <option value="tec-refrigeracao">Téc. em refrigeração</option>
-                                    <option value="vedacao">Vedação</option>
-                                </>
-                            )}
-
-                            {categoria === 'lazer-eventos' && (
-                                <>
-                                    <option value="" disabled hidden>Serviço</option>
-                                    <option value="aluguel-brinquedos">Aluguel de brinquedos</option>
-                                    <option value="decorador-festas">Decorador de festas</option>
-                                    <option value="aluguel-eletronicos">Aluguel de equi. eletrônicos</option>
-                                    <option value="dj-musico">DJ/Músico</option>
-                                    <option value="fotografo">Fotógrafo</option>
-                                    <option value="aluguel-mesas-cadeiras">Aluguel de mesas e cadeiras</option>
-                                    <option value="garcom-barman">Garçom/Barman</option>
-                                    <option value="aluguel-fantasias">Aluguel de fantasias</option>
-                                    <option value="montador-eventos">Montador de eventos</option>
-                                    <option value="animador-palhaco">Animador/palhaço</option>
-                                    <option value="sonoplastia">Sonoplastia/Téc. de som</option>
-                                    <option value="buffet">Buffet</option>
-                                </>
-                            )}
-
-                            {categoria === 'cuidado-pessoal' && (
-                                <>
-                                    <option value="" disabled hidden>Serviço</option>
-                                    <option value="acupunturista">Acupunturista</option>
-                                    <option value="fisioterapeuta-domiciliar">Fisioterapeuta domiciliar</option>
-                                    <option value="aromaterapeuta">Aromaterapeuta</option>
-                                    <option value="personal-trainer">Personal trainer</option>
-                                    <option value="auriculoterapeuta">Auriculoterapeuta</option>
-                                    <option value="quiropraxista">Quiropraxista</option>
-                                    <option value="cuidador-idosos">Cuidador(a) de idosos</option>
-                                    <option value="ventosaterapeuta">Ventosaterapeuta</option>
-                                    <option value="enfermeiro-particular">Enfermeiro(a) particular</option>
-                                </>
-                            )}
-
-                            {categoria === 'limpeza-organizacao' && (
-                                <>
-                                    <option value="" disabled hidden>Serviço</option>
-                                    <option value="dedetizador">Dedetizador</option>
-                                    <option value="limpeza-estofados-colchoes">Limpeza de estofados e colchões</option>
-                                    <option value="diarista">Diarista</option>
-                                    <option value="enceramento-pisos">Enceramento de pisos</option>
-                                    <option value="limpeza-pos-obra">Limpeza pós-obra</option>
-                                    <option value="limpeza-ar-condicionado">Limpeza de ar-condicionado</option>
-                                    <option value="limpeza-telhado">Limpeza de telhado</option>
-                                    <option value="limpeza-caixa-dagua">Limpeza de caixa d'água</option>
-                                    <option value="limpeza-vidro">Limpeza de vidro</option>
-                                    <option value="limpeza-carpete">Limpeza de carpete</option>
-                                    <option value="tratamento-pragas">Tratamento de pragas</option>
-                                    <option value="zelador">Zelador</option>
-                                </>
-                            )}
-
-                            {categoria === 'reforma-construcao' && (
-                                <>
-                                    <option value="" disabled hidden>Serviço</option>
-                                    <option value="aplicacao-massa-corrida">Aplicação de massa corrida</option>
-                                    <option value="instalacao-bancadas-pias">Instalação de bancadas e pias</option>
-                                    <option value="azulejista">Azulejista</option>
-                                    <option value="instalacao-drywall">Instalação de Drywall</option>
-                                    <option value="calheiro">Calheiro</option>
-                                    <option value="instalacao-portas-janelas">Instalação de portas e janelas</option>
-                                    <option value="colocacao-forro-pvc">Colocação de forro de PVC</option>
-                                    <option value="instalacao-telhados">Instalação de telhados</option>
-                                    <option value="fundacao-alvenaria">Fundação e alvenaria</option>
-                                    <option value="pedreiro">Pedreiro</option>
-                                    <option value="gesseiro">Gesseiro</option>
-                                    <option value="reforma-fachadas">Reforma de fachadas</option>
-                                    <option value="impermeabilizacao-lajes-paredes">Impermeabilização de lajes e paredes</option>
-                                    <option value="reforma-pisos">Reforma de pisos</option>
-                                </>
-                            )}
+                            {getServicesByCategory(categoria).map(service => (
+                                <option
+                                    key={service.id}
+                                    value={service.value} // Usa a chave única para a busca do ID
+                                >
+                                    {service.nome}
+                                </option>
+                            ))}
                         </select>
                     </div>
 
@@ -313,14 +355,14 @@ export default function ProviderRegistration() {
                             <option value="" disabled hidden>Disponibilidade 24H</option>
                             <option value="true">Sim</option>
                             <option value="false">Não</option>
-
                         </select>
                     </div>
 
                     <input type="email" placeholder="Email" name='email' onChange={handleChangeSetDataProvider} required />
                     <input type="password" placeholder="Senha" onChange={handleChangeSetDataProvider} name='password' required />
-                    <input type="password" placeholder="Confirme a Senha" onChange={handleChangeSetDataProvider} name='confirmPassword' required />
-                    <button type="submit">Cadastrar</button>
+                    <input type="password" placeholder="Confirme a Senha" onChange={handleChangeSetDataProvider} name='password2' required />
+                    
+                    <button onClick={(e) => { e.preventDefault(); register(formDataProvider); }} type="submit">Cadastrar</button>
                 </form>
             </div>
 

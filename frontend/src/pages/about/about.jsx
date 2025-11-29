@@ -53,7 +53,7 @@ export default function About () {
                     
                     <div data-aos="zoom-out" className={styles.teambox}>
                         <img src="/img/students/renata.png" alt="" />
-                        <h4>Renata goes</h4>
+                        <h4>Renata Santiago</h4>
                         <p>Professora | Lider tecnico</p>
                     </div>
 
