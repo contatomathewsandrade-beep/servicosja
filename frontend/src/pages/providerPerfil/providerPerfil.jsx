@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styles from './providerPerfil.module.css';
+import ProviderServices from '../../services/provider';
+import { useNavigate } from 'react-router';
+import RatingChart from './RatingChart'; // Componente de Área (Gráfico)
 
-// --- Dados Mock (Inalterados) ---
+// --- MOCK DATA (Seus dados mockados) ---
 const mockUserData = {
     nome: "Eduardo Jesen",
     cargo: "Designer Gráfico",
@@ -24,11 +27,11 @@ const mockUserData = {
         "../assets/img/imagemServico4.png",
     ],
     avaliacoes: [
-        { estrelas: 5, percentual: 82 },
-        { estrelas: 4, percentual: 10 },
-        { estrelas: 3, percentual: 4 },
-        { estrelas: 2, percentual: 2 },
-        { estrelas: 1, percentual: 2 },
+        { estrelas: 5, percentual: 82, quantidade: 0 },
+        { estrelas: 4, percentual: 10, quantidade: 0 },
+        { estrelas: 3, percentual: 4, quantidade: 0 },
+        { estrelas: 2, percentual: 2, quantidade: 0 },
+        { estrelas: 1, percentual: 2, quantidade: 0 },
     ]
 };
 
@@ -37,11 +40,10 @@ const TABS = {
     MESSAGES: 'Mensagens'
 };
 
-// --- Componente Gallery (Inalterado) ---
+// --- Componente Gallery (Não alterado) ---
 const Gallery = ({ images, onImageSelect, onImageUpload, selectedImage }) => {
     return (
         <div className={styles.galleryContainer}>
-            {/* Imagem em Destaque */}
             <div className={styles.mainImageContainer}>
                 {selectedImage ? (
                     <img
@@ -56,10 +58,7 @@ const Gallery = ({ images, onImageSelect, onImageUpload, selectedImage }) => {
                 )}
             </div>
 
-            {/* Miniaturas da Galeria e Botão de Adicionar */}
             <div className={styles.thumbnailsContainer}>
-
-                {/* Botão de Adicionar Foto (Input escondido) */}
                 <label htmlFor="file-upload" className={styles.addThumbnail}>
                     <span role="img" aria-label="Adicionar Foto">➕</span> Adicionar Foto
                 </label>
@@ -71,7 +70,6 @@ const Gallery = ({ images, onImageSelect, onImageUpload, selectedImage }) => {
                     style={{ display: 'none' }}
                 />
 
-                {/* Renderiza as miniaturas das imagens do usuário */}
                 {images.map((item, index) => (
                     <div
                         key={item.id}
@@ -86,22 +84,17 @@ const Gallery = ({ images, onImageSelect, onImageUpload, selectedImage }) => {
     );
 };
 
-// --- Componente Principal ProviderPerfil (Corrigido para Início Vazio) ---
+
 export default function ProviderPerfil({ userData = mockUserData }) {
     const [activeTab, setActiveTab] = useState(TABS.DASHBOARD);
-    
+    const [userGalleryImages, setUserGalleryImages] = useState([]);
+    const [currentMainImage, setCurrentMainImage] = useState(null);
+
     const getTabClassName = (tab) => {
         return `${styles.tab} ${activeTab === tab ? styles.active : ''}`;
     };
 
-    // INÍCIO VAZIO: O estado inicial é [] e null.
-    const [userGalleryImages, setUserGalleryImages] = useState([]);
-    const [currentMainImage, setCurrentMainImage] = useState(null);
-
-    // --- Lógica de Limpeza de URL Object ---
-    // ATENÇÃO: Se o userGalleryImages for muito grande, incluir ele na dependência
-    // pode ser caro. Removendo a dependência, a limpeza usa o estado final no momento
-    // da desmontagem do componente, o que é o comportamento mais comum para limpeza.
+    // --- Lógica de Limpeza de URL Object (Não alterado) ---
     useEffect(() => {
         return () => {
             userGalleryImages.forEach(item => {
@@ -110,9 +103,9 @@ export default function ProviderPerfil({ userData = mockUserData }) {
                 }
             });
         };
-    }, []); // Array de dependências vazio para rodar a limpeza apenas na desmontagem.
+    }, []); 
 
-    // --- Lógica de Upload ---
+    // --- Lógica de Upload e Seleção (Não alterado) ---
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -128,127 +121,139 @@ export default function ProviderPerfil({ userData = mockUserData }) {
         event.target.value = null;
     };
     
-    // --- Lógica de Seleção ---
     const handleImageSelect = (url) => {
         setCurrentMainImage(url);
     };
     
-    // --- Renderização (Inalterada) ---
+    const {getProviderPerfil, providerAccount} = ProviderServices()
+    const auth = localStorage.getItem('auth')
+    const authData = auth ? JSON.parse(auth) : {}; 
+    const profileId = authData.profile_id; 
+
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (!profileId) {
+            const timer = setTimeout(() => {
+                navigate('/login');
+            }, 0);
+            return () => clearTimeout(timer);
+        } 
+    }, [profileId, navigate]); 
+
+    // 2. Chamada da API
+    useEffect(()=>{
+        if (profileId) {
+            getProviderPerfil(profileId);
+        }
+    },[profileId]) 
+    
+    
+    useEffect(() => {
+        if (providerAccount?.localizacao) {
+            const locationQuery = providerAccount.localizacao;
+            console.log(`Dados de localização carregados: ${locationQuery}. Nenhuma ação de mapa está sendo executada.`);
+        }
+    }, [providerAccount]);
+    // --------------------------------------------------------------------
+    
+    const comentarios = providerAccount.ultimas_avaliacoes
+    const estatisticas = providerAccount.estatisticas
+    
+    // --- Lógica de Transformação de Dados do Gráfico ---
+    const transformedRatings = useMemo(() => {
+        if (!estatisticas || !estatisticas.distribuicao) {
+            return userData.avaliacoes; 
+        }
+
+        const distribuicao = estatisticas.distribuicao;
+        const keys = Object.keys(distribuicao); 
+        
+        const newRatings = keys.map(key => {
+            const starNumber = parseInt(key.split('_')[1], 10);
+            const data = distribuicao[key];
+
+            return {
+                estrelas: starNumber,
+                percentual: data.porcentagem,
+                quantidade: data.quantidade,
+            };
+        });
+
+        newRatings.sort((a, b) => b.estrelas - a.estrelas);
+        return newRatings;
+    }, [estatisticas, userData.avaliacoes]); 
+    
+    
     return (
         <div className={styles.dashboardPage}>
-            {/* ... Header e Tabs ... */}
             <header className={styles.header}>
                 <div className={styles.perfil}>
                     <img src={userData.perfilImg} alt="perfil" />
                     <div>
-                        <h2>{userData.nome}</h2>
-                        <p>{userData.cargo}</p>
+                        <h2>{providerAccount?.nome?.toUpperCase()}</h2>
+                        <p>{providerAccount?.servico?.nome}</p>
                     </div>
                 </div>
             </header>
 
-            <div className={styles.tabs}>
-                <a 
-                    href="#" 
-                    onClick={(e) => { e.preventDefault(); setActiveTab(TABS.DASHBOARD); }}
-                    className={getTabClassName(TABS.DASHBOARD)} 
-                >
-                    {TABS.DASHBOARD}
-                </a>
-                <a 
-                    href="#" 
-                    onClick={(e) => { e.preventDefault(); setActiveTab(TABS.MESSAGES); }}
-                    className={getTabClassName(TABS.MESSAGES)}
-                >
-                    {TABS.MESSAGES}
-                </a>
-            </div>
-
             <div className={styles.container}>
-
-                {/* Informações Pessoais */}
+                
+                {/* 1. Informações Pessoais */}
                 <div className={styles.box}>
                     <h2>Informações Pessoais</h2>
                     <div className={styles.descricaoGrid}>
-                        <span>Nome: {userData.nome}</span>
-                        <span>Data de Nasc: {userData.dataNasc}</span>
-                        <span>Gênero: {userData.genero}</span>
-                        <span>Telefone: {userData.telefone}</span>
-                        <span>Cargo: {userData.cargo}</span>
-                        <span>Data de Registro: {userData.dataRegistro}</span>
-                        <span>Email: {userData.email}</span>
-                        <span>LinkedIn: {userData.linkedIn}</span>
+                        <span>Nome: {providerAccount?.nome}</span>
+                        <span>Data de Nasc: {providerAccount?.data_nascimento}</span>
+                        <span>Gênero: {providerAccount?.genero }</span>
+                        <span>Telefone: {providerAccount?.telefone_publico}</span>
+                        <span>Cargo: {providerAccount?.servico?.nome}</span>
+                        <span>Data de Registro: {providerAccount?.data_registro}</span>
+                        <span>Email: {providerAccount?.email}</span>
+                        <span>Disponibilidade: {providerAccount?.disponibilidade === true ? "Disponivel final de semana" : "Indisponivel final de semana"}</span>
+                        <span>Cidade: {providerAccount?.cidade}</span>
+                        <span>Bairro: {providerAccount?.bairro}</span>
                     </div>
                 </div>
 
-                {/* Mensagens e Calendário */}
+                {/* 2. Mensagens e Galeria */}
                 <div className={styles.flex}>
                     <div className={`${styles.box} ${styles.mensagens}`}> 
-                        <h2>Mensagens</h2>
-                        <table>
-                            <thead>
-                                <tr><th>Nome</th><th>Data</th></tr>
-                            </thead>
-                            <tbody>
-                                {userData.mensagens.map((msg, index) => (
-                                    <tr key={index}>
-                                        <td>{msg.nome}</td>
-                                        <td>{msg.data}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className={`${styles.box} ${styles.calendario}`}>
-                        <h2>Calendário</h2>
-                        <div className={styles.calendarBox}>
-                            Novembro 2025
-                            <div className={styles.calendarGrid}>
-                                {Array.from({ length: 30 }, (_, i) => i + 1).map(day => (
-                                    <div key={day}>{day}</div>
-                                ))}
-                            </div>
+                        <h2>Últimas Avaliações</h2>
+                        <div className={`${styles.flex} ${styles.flexBox}`}>
+                            <h5>Nome</h5>
+                            <h5>Data</h5>
                         </div>
+                            {comentarios?.map((msg, index) => (
+                               <div className={styles.commentsBox} key={index}>
+                                    <div className={styles.w_50}>{msg.cliente_nome}</div>
+                                    <div className={styles.w_50}>{msg.data}</div>
+                                    <div className={styles.line}>{msg.comentario}</div>
+                               </div>
+                            ))}
                     </div>
-                </div>
-
                 
-                {/* --- COMPONENTE GALLERY --- */}
-                <div className={styles.w_50}>
-                   <Gallery
-                        images={userGalleryImages }
-                        onImageSelect={handleImageSelect}
-                        onImageUpload={handleImageUpload}
-                        selectedImage={currentMainImage}
-                    /> 
+                    <div className={styles.w_50}>
+                       <Gallery
+                            images={userGalleryImages }
+                            onImageSelect={handleImageSelect}
+                            onImageUpload={handleImageUpload}
+                            selectedImage={currentMainImage}
+                        /> 
+                    </div>
                 </div>
 
-                {/* Avaliações */}
+                {/* 3. Gráfico de Avaliações (AreaChart) */}
                 <div className={`${styles.box} ${styles.avaliacoesBox}`}>
-                    <h2>Avaliações</h2>
-                    <div className={styles.graficoLinhas}>
-                        <svg width="100%" height="150" viewBox="0 0 320 125">
-                            <polyline 
-                                points="10,120 60,80 110,90 160,40 210,70 260,30 310,50" 
-                                fill="none" 
-                                stroke="#1a06c9" 
-                                strokeWidth="3" 
-                            />
-                        </svg>
-                    </div>
-                    <div className={styles.ratingsList}>
-                        {userData.avaliacoes.map((rating) => (
-                            <div key={rating.estrelas} className={styles.ratingRow}>
-                                <span>{rating.estrelas} ★</span>
-                                <div 
-                                    className={`${styles.bar} ${styles[`bar${rating.estrelas}`]}`} 
-                                    style={{ width: `${rating.percentual}%` }}
-                                ></div>
-                                <span>{rating.percentual}%</span>
-                            </div>
-                        ))}
-                    </div>
+                    <h2>Distribuição de Avaliações</h2>
+                    
+                    {estatisticas?.distribuicao && (
+                        <RatingChart distribuicao={estatisticas.distribuicao} />
+                    )}
                 </div>
+
+                {/* 4. BLOCO DO MAPA (AGORA APENAS INFORMAÇÃO DE LOCALIZAÇÃO) */}
+               
             </div>
         </div>
     );

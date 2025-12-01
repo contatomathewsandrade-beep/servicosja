@@ -3,6 +3,19 @@
     justify-content: space-around;
     align-items: center;
     width: 100%;
+    
+    /* PROPRIEDADES NOVAS PARA FIXAR E ANIMAR */
+    position: fixed; 
+    top: 0; 
+    z-index: 1000; 
+    background-color: white; /* Garante que o conteúdo abaixo não vaze */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Opcional: Adiciona uma sombra */
+    transition: transform 0.3s ease-in-out; /* Transição suave para o deslize */
+}
+
+/* CLASSE NOVA PARA ESCONDER A NAVBAR */
+.navbarHidden {
+    transform: translateY(-100%); /* Desliza a barra para fora da viewport */
 }
 
 .navbarContainer img{
@@ -29,7 +42,7 @@
 .loginButton{
     border: 2px solid var(--blue);
     border-radius: 16px;
-    padding: 5px  10px ;
+    padding: 5px  10px ;
     color: var(--blue);
     cursor: pointer;
     align-items: center;
@@ -81,6 +94,9 @@
     cursor: pointer;
 }
 
+.loginButton{
+    padding: 8px 12px;
+}
 
 
 /* Responsive Design */
@@ -92,7 +108,7 @@
 
 .navLinkContainer{
     display: none;
- }
+}
     .MobileNavbarLinksContainer{
         display: flex;
     }
@@ -104,6 +120,4 @@
     .navbarContainer{
         justify-content: space-between;
     }
-
-
 }

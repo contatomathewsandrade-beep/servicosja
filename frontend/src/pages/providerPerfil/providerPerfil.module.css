@@ -15,6 +15,7 @@
     color: white;
     position: relative;
     font-family: var(--font); /* Usando a variável de fonte */
+    margin-top: 60px;
 }
 
 .perfil {
@@ -324,4 +325,28 @@ table th, table td {
 
 .w_50{
     width: 50%;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
 }
+
+.commentsBox{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    overflow-x: auto;
+    border: 2px solid var(--orange);
+    padding: 0 20px ;
+    border-radius: 12px;
+    margin-top: 15px;
+
+}
+
+.flexBox{
+    width: 100%;
+    align-items: center;
+    justify-content: space-around;
+    display: flex;
+}
+

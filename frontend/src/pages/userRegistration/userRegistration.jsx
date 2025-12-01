@@ -1,42 +1,47 @@
+// components/UserRegistration.js (ou sua página de cadastro)
+
 import { useState } from 'react';
 import { IMaskInput } from 'react-imask';
+import { useNavigate } from 'react-router-dom'; // 👈 Importação para React Router Dom v6
 import styles from './Registration.module.css';
 import UserServices from '../../services/user';
 import Loading from '../loading/loading';
 
-// Função auxiliar para remover caracteres não numéricos
+
+// --- Funções Auxiliares (Não Mudaram) ---
 const cleanNonNumeric = (value) => {
     return value ? value.replace(/[^0-9]/g, '') : '';
 };
 
-// Função auxiliar para obter a primeira mensagem de erro para um campo
 const getErrorMessage = (formErrors, fieldName) => {
     if (formErrors[fieldName] && Array.isArray(formErrors[fieldName]) && formErrors[fieldName].length > 0) {
         return formErrors[fieldName][0];
     }
     return null;
 };
+// ----------------------------------------
+
 
 export default function UserRegistration() {
-    const [formDataUser, setFormDataUser] = useState({});
+    // 💡 Hook de navegação do React Router Dom
+    const navigate = useNavigate(); 
     
-    // NOVO ESTADO: Armazena os erros retornados pela API
+    const [formDataUser, setFormDataUser] = useState({});
     const [formErrors, setFormErrors] = useState({}); 
 
-    const {register , loading} = UserServices()
+    const {register , loading} = UserServices();
     
     const caseSensitiveFields = ['password', 'password2', 'genero'];
 
+    // --- Handlers (Não Mudaram) ---
     const handleChangeSetDataUser = (e) => {
         const { name, value } = e.target;
         
-        // Limpa o erro para o campo atual ao iniciar a edição
         setFormErrors(prevErrors => ({
             ...prevErrors,
             [name]: null 
         }));
 
-        // Mantém a lógica de conversão para minúsculas para campos não mascarados
         const newValue = caseSensitiveFields.includes(name) 
             ? value 
             : value.toLowerCase(); 
@@ -47,11 +52,9 @@ export default function UserRegistration() {
         }));
     };
     
-    // Função ajustada para lidar com IMaskInput
     const handleMaskedInputChange = (value, masked, e) => {
         const name = e.target.name; 
         
-        // Limpa o erro para o campo atual
         setFormErrors(prevErrors => ({
             ...prevErrors,
             [name]: null 
@@ -60,10 +63,8 @@ export default function UserRegistration() {
         let valueToSave;
         
         if (name === 'dt_nascimento') {
-            // Salva o valor com máscara (DD/MM/AAAA)
             valueToSave = value; 
         } else {
-            // Para CPF, CEP e Telefone, salva apenas os dígitos (unmaskedValue)
             valueToSave = cleanNonNumeric(value);
         }
         
@@ -72,21 +73,27 @@ export default function UserRegistration() {
             [name]: valueToSave
         }));
     };
+    // ----------------------------------------
     
-    // NOVA FUNÇÃO: Trata o envio do formulário
+    // FUNÇÃO PRINCIPAL: Trata o envio do formulário e a navegação
     const handleSubmit = (e) => {
         e.preventDefault();
-        setFormErrors({}); // Limpa erros antigos antes de enviar
+        setFormErrors({}); 
 
         register(formDataUser)
             .then((result) => {
-                // Lógica de sucesso (ex: redirecionar, mostrar mensagem)
                 console.log('Cadastro realizado com sucesso!', result);
+                
+                // 🚀 REDIRECIONAMENTO CORRIGIDO: Usa navigate()
+                navigate('/userPerfil'); 
             })
             .catch((errorObject) => {
-                // Lógica de erro: Captura o objeto de erros da API
                 console.error('Erros de validação da API:', errorObject);
-                setFormErrors(errorObject); // Salva os erros no estado
+                if (errorObject && typeof errorObject === 'object') {
+                     setFormErrors(errorObject); 
+                } else {
+                    alert('Ocorreu um erro inesperado. Tente novamente.');
+                }
             });
     };
     
@@ -102,7 +109,6 @@ export default function UserRegistration() {
             <div className={styles.registrationForm}>
                 <h5>A um click da solução do seu problema.</h5>
                 <h2>CADASTRE-SE!</h2>
-                {/* 1. O formulário agora usa handleSubmit */}
                 <form onSubmit={handleSubmit}>
                     
                     {/* Campo: nome_completo */}
@@ -120,33 +126,36 @@ export default function UserRegistration() {
                     
                     <div className={styles.input50}>
                         {/* Campo: cpf */}
-                        {getErrorMessage(formErrors, 'cpf') && (
-                            <p className={styles.errorMessage}>{getErrorMessage(formErrors, 'cpf')}</p>
-                        )}
-                        <IMaskInput
-                            mask="000.000.000-00"
-                            name='cpf' 
-                            // Propagamos 'e.target.name' via objeto para handleMaskedInputChange
-                            onAccept={(value, mask, e) => handleMaskedInputChange(value, mask, { target: { name: 'cpf' } })}
-                            value={formDataUser.cpf || ''}
-                            placeholder='Cpf'
-                            type="text" 
-                            required 
-                        /> 
+                        <div style={{ flex: 1 }}>
+                            {getErrorMessage(formErrors, 'cpf') && (
+                                <p className={styles.errorMessage}>{getErrorMessage(formErrors, 'cpf')}</p>
+                            )}
+                            <IMaskInput
+                                mask="000.000.000-00"
+                                name='cpf' 
+                                onAccept={(value, mask, e) => handleMaskedInputChange(value, mask, { target: { name: 'cpf' } })}
+                                value={formDataUser.cpf || ''}
+                                placeholder='Cpf'
+                                type="text" 
+                                required 
+                            /> 
+                        </div>
                         
                         {/* Campo: dt_nascimento */}
-                        {getErrorMessage(formErrors, 'dt_nascimento') && (
-                            <p className={styles.errorMessage}>{getErrorMessage(formErrors, 'dt_nascimento')}</p>
-                        )}
-                        <IMaskInput
-                            mask="00/00/0000"
-                            name='dt_nascimento'
-                            onAccept={(value, mask, e) => handleMaskedInputChange(value, mask, { target: { name: 'dt_nascimento' } })} 
-                            value={formDataUser.dt_nascimento || ''}
-                            placeholder='Data de nascimento'
-                            type="text"
-                            required 
-                        /> 
+                        <div style={{ flex: 1, marginLeft: '10px' }}>
+                            {getErrorMessage(formErrors, 'dt_nascimento') && (
+                                <p className={styles.errorMessage}>{getErrorMessage(formErrors, 'dt_nascimento')}</p>
+                            )}
+                            <IMaskInput
+                                mask="00/00/0000"
+                                name='dt_nascimento'
+                                onAccept={(value, mask, e) => handleMaskedInputChange(value, mask, { target: { name: 'dt_nascimento' } })} 
+                                value={formDataUser.dt_nascimento || ''}
+                                placeholder='Data de nascimento'
+                                type="text"
+                                required 
+                            /> 
+                        </div>
                     </div>
                     
                     {/* Campo: genero */}
@@ -167,31 +176,35 @@ export default function UserRegistration() {
                     </select>
 
                     <div className={styles.input50}>
-                        {/* Campo: rua */}
-                        {getErrorMessage(formErrors, 'rua') && (
-                            <p className={styles.errorMessage}>{getErrorMessage(formErrors, 'rua')}</p>
-                        )}
-                        <input 
-                            type="text" 
-                            placeholder='Rua' 
-                            name='rua' 
-                            value={formDataUser.rua || ''}
-                            onChange={handleChangeSetDataUser} 
-                            required
-                        /> 
+                         {/* Campo: rua */}
+                        <div style={{ flex: 1 }}>
+                            {getErrorMessage(formErrors, 'rua') && (
+                                <p className={styles.errorMessage}>{getErrorMessage(formErrors, 'rua')}</p>
+                            )}
+                            <input 
+                                type="text" 
+                                placeholder='Rua' 
+                                name='rua' 
+                                value={formDataUser.rua || ''}
+                                onChange={handleChangeSetDataUser} 
+                                required
+                            /> 
+                        </div>
 
                         {/* Campo: numero_casa */}
-                        {getErrorMessage(formErrors, 'numero_casa') && (
-                            <p className={styles.errorMessage}>{getErrorMessage(formErrors, 'numero_casa')}</p>
-                        )}
-                        <input 
-                            type="number" 
-                            placeholder='Numero' 
-                            name='numero_casa' 
-                            value={formDataUser.numero_casa || ''}
-                            onChange={handleChangeSetDataUser} 
-                            required
-                        /> 
+                        <div style={{ flex: 1, marginLeft: '10px' }}>
+                            {getErrorMessage(formErrors, 'numero_casa') && (
+                                <p className={styles.errorMessage}>{getErrorMessage(formErrors, 'numero_casa')}</p>
+                            )}
+                            <input 
+                                type="number" 
+                                placeholder='Numero' 
+                                name='numero_casa' 
+                                value={formDataUser.numero_casa || ''}
+                                onChange={handleChangeSetDataUser} 
+                                required
+                            /> 
+                        </div>
                     </div>
 
                     {/* Campo: cep */}
@@ -240,7 +253,6 @@ export default function UserRegistration() {
                     )}
                     <input type="password" placeholder="Confirme a Senha" name='password2' onChange={handleChangeSetDataUser} value={formDataUser.password2 || ''} required />
                     
-                    {/* O botão usa type="submit" para acionar o form.onSubmit */}
                     <button type="submit">Cadastrar</button>
                 </form>
             </div>

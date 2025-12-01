@@ -39,6 +39,7 @@
     background-color: white;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
     padding:10px 50px;
     gap: 5px;
