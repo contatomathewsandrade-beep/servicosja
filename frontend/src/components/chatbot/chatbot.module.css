@@ -127,6 +127,11 @@
   font-size: 14px;
 }
 
+.textoChat{
+  font-size: 16px;
+
+}
+
 .msgUser {
   background: var(--primary-orange);
   color: white;

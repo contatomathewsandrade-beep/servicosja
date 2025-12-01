@@ -219,7 +219,9 @@
 
 
 @media (max-width: 780px) {
-
+    .aboutContainer{
+        margin-top: 80px;
+    }
   
    .modalContent{
     width: 100%;

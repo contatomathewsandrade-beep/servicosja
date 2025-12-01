@@ -73,13 +73,25 @@
 .iconbg{
     font-size: 18px;
     background-color: white;
-    padding: 0px 5px;
+    padding: 5px 5px;
     border-radius: 8px;
     color: var(--orange);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.flex{
+    display: flex;
+    gap: 10px;
 }
 
 .social{
     font-family: var(--font-bold);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }    
 
 .social div svg{
@@ -129,8 +141,17 @@
 }
 
 @media screen and (max-width:800px) {
-    .contacts{
+    .contacts button{
         display: none;
+    }
+
+    .contacts {
+        font-size: 10px;
+        text-align: center;
+    }
+
+    .contacts h3{
+        font-size: 18px;
     }
 
     .infosContainer{
@@ -146,10 +167,26 @@
 }
 
     .logoContainer img{
-        width: 200px;
+        width: 100%;
+    }
+
+    .infosContainer{
+        border: 0;
+        flex-direction: column-reverse;
+        align-items: center;
+        gap: 15px;
     }
 
     .social img{
         display: none;
     }
+
+    .parceiros{
+        display: none;
+    }
+
+    .footerContainer{
+        padding: 20px 0;
+    }
+    
 }

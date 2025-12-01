@@ -323,7 +323,7 @@ export default function Services () {
 
                     {providers.map((provider)=> (
                         <div className={styles.box} onClick={() => {handleProviderSelected(provider)}} key={provider.id}>
-                            <ProviderBox name={provider.nome}  location={`${provider.cidade}, ${provider.bairro}`} rating={provider.nota_media} resum={'Trancista. Especialista em tranças e penteados afro. Atendimento em domicílio.'} key={provider.id} />
+                            <ProviderBox name={provider.nome} location={`${provider.cidade}, ${provider.bairro}`} rating={provider.nota_media} resum={'Trancista. Especialista em tranças e penteados afro. Atendimento em domicílio.'} key={provider.id} />
                         </div>
                     ))}
                     

@@ -16,27 +16,29 @@ export default function Footer () {
             <div className={styles.infosContainer}>
 
                 <div className={styles.footerMap}>
-                <h4>Mapa do site</h4>
-                <Link className={styles.infosContainerLink} to="/">Home</Link>
-                <Link className={styles.infosContainerLink} to="/services">Serviços</Link>
-                <Link className={styles.infosContainerLink} to="/about">Sobre nós</Link>
-                <Link className={styles.infosContainerLink} to="/">Planos</Link>
-                <Link className={styles.infosContainerLink} to="/">Sou um profissional</Link>
-            </div>
+                    <h4>Mapa do site</h4>
+                    <Link className={styles.infosContainerLink} to="/">Home</Link>
+                    <Link className={styles.infosContainerLink} to="/services">Serviços</Link>
+                    <Link className={styles.infosContainerLink} to="/about">Sobre nós</Link>
+                    <Link className={styles.infosContainerLink} to="/">Planos</Link>
+                    <Link className={styles.infosContainerLink} to="/">Sou um profissional</Link>
+                </div>
 
 
                 <div className={styles.contacts}>
                     <button><FaRegUser className={styles.icon} />Atendimento Online</button>
                     <h3>Contato</h3>
                     <p><BsTelephone className={styles.icon}/>(81) 98635-4475</p>
-                    <p><CiMail className={styles.icon}/>atendimento@servicosja.com.br</p>
+                    <p><CiMail className={styles.icon}/>contato@servicosja.com.br</p>
                 </div>
 
                 <div className={styles.social}>
                     <h3>Redes Sociais</h3>
-                    <div> <a href='https://www.linkedin.com/' target='_blank'  className={styles.iconbg}><FaLinkedin/></a> <a  href='https://www.instagram.com/' target='_blank'  className={styles.iconbg}><FaInstagram /></a > <a  href='https://www.instagram.com/' target='_blank'  className={styles.iconbg}><FaFacebook /></a > <a  href='https://www.instagram.com/' target='_blank'  className={styles.iconbg}><FaTwitter /></a ></div>
-                    <h3>Parceiros</h3>
-                    <img src='/img/partners/partners.png'/>
+                    <div className={styles.flex}> <a href='https://www.linkedin.com/' target='_blank'  className={styles.iconbg}><FaLinkedin/></a> <a  href='https://www.instagram.com/' target='_blank'  className={styles.iconbg}><FaInstagram /></a > <a  href='https://www.instagram.com/' target='_blank'  className={styles.iconbg}><FaFacebook /></a > <a  href='https://www.instagram.com/' target='_blank'  className={styles.iconbg}><FaTwitter /></a ></div>
+                    <div className={styles.parceiros}>
+                        <h3>Parceiros</h3>
+                        <img src='/img/partners/partners.png'/>
+                    </div>
                 </div>
             </div>
             <div className={styles.terms}>

@@ -217,7 +217,7 @@ export default function ProviderPerfil({ userData = mockUserData }) {
                 </div>
 
                 {/* 2. Mensagens e Galeria */}
-                <div className={styles.flex}>
+                <div className={`${styles.flex} ${styles.colum}`}>
                     <div className={`${styles.box} ${styles.mensagens}`}> 
                         <h2>Últimas Avaliações</h2>
                         <div className={`${styles.flex} ${styles.flexBox}`}>
