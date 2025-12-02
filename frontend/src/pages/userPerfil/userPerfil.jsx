@@ -68,8 +68,6 @@ export default function UserPerfil({ userData = mockUserData }) {
     const handleUpdateProfile = () => {
         getMe().then(data => setProfileData(data));
     };
-
-    // Combine mock data structure with real data if available
     const displayData = profileData ? {
         nome: profileData.nome_completo || "Nome não informado",
         cargo: profileData.tipo_usuario === 'cliente' ? "Cliente" : "Prestador",
