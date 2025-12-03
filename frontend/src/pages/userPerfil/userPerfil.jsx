@@ -92,6 +92,50 @@ export default function ProviderPerfil({ userData = mockUserData }) {
     const [userGalleryImages, setUserGalleryImages] = useState([]);
     const [currentMainImage, setCurrentMainImage] = useState(null);
 
+<<<<<<< HEAD
+    const [profileData, setProfileData] = useState(null);
+    const { getMe } = UserServices();
+
+    useEffect(() => {
+        getMe()
+            .then(data => {
+                setProfileData(data);
+            })
+            .catch(err => {
+                console.error("Erro ao buscar dados do perfil:", err);
+            });
+    }, []);
+
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
+
+    const handleUpdateProfile = () => {
+        getMe().then(data => setProfileData(data));
+    };
+    const displayData = profileData ? {
+        nome: profileData.nome_completo || "Nome não informado",
+        cargo: profileData.tipo_usuario === 'cliente' ? "Cliente" : "Prestador",
+        // Tenta pegar de perfil_cliente ou da raiz
+        dataNasc: profileData.perfil_cliente?.dt_nascimento || profileData.dt_nascimento || "N/A",
+        genero: profileData.perfil_cliente?.genero || profileData.genero || "N/A",
+        telefone: profileData.perfil_cliente?.telefone_contato || profileData.telefone_contato || "N/A",
+        dataRegistro: profileData.data_joined ? new Date(profileData.data_joined).toLocaleDateString('pt-BR') : "N/A",
+        email: profileData.email || "Email não informado",
+        linkedIn: "N/A", // Não existe no cadastro
+        perfilImg: userData.perfilImg, // Mantém imagem mockada por enquanto
+        mensagens: userData.mensagens, // Mantém mock
+        galeria: userData.galeria, // Mantém mock
+        avaliacoes: userData.avaliacoes // Mantém mock
+    } : userData;
+
+
+    // O objeto 'styles' agora contém todas as suas classes CSS
+
+    // Função auxiliar para combinar classes (útil para tabs)
+=======
+>>>>>>> b6e46241e302809f577b50fb4c7e02f0d7521076
     const getTabClassName = (tab) => {
         return `${styles.tab} ${activeTab === tab ? styles.active : ''}`;
     };
