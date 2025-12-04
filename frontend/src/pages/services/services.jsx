@@ -255,7 +255,7 @@ export default function Services () {
                     </div>
                 </div>
 
-                <section className={styles.providerContainer}>
+                <section className={loading ? styles.providerContainerLogin : styles.providerContainer}>
 
                     {loading && (
                     <Loading2/>

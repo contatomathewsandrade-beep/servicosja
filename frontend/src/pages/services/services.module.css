@@ -164,6 +164,20 @@
     padding-bottom: 120px;
 }
 
+.providerContainerLogin {
+      width: 70%;
+    height: 100%;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(1 , 1fr);
+    flex-wrap: wrap;
+    gap: 30px;
+    cursor: pointer;
+    padding-top: 60px;
+    margin-bottom: 50px;
+    padding-bottom: 120px;
+}
+
 
 @media screen and (max-width:1549px) {
 

@@ -237,61 +237,10 @@ export default function UserPerfil({ userData = mockUserData }) {
                         </table>
                     </div>
 
-                    {/* Calendário */}
-                    <div className={`${styles.box} ${styles.calendario}`}>
-                        <h2>Calendário</h2>
-                        <div className={styles.calendarBox}>
-                            Novembro 2025
-                            <div className={styles.calendarGrid}>
-                                {Array.from({ length: 30 }, (_, i) => i + 1).map(day => (
-                                    <div key={day}>{day}</div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+                  
                 </div>
 
-                {/* --- Galeria de Fotos (Fotos) --- */}
-                <div className={styles.box}>
-                    <h2>Galeria de Fotos</h2>
-                    <div className={styles.fotosGrid}>
-                        {displayData.galeria.map((src, index) => (
-                            <img key={index} src={src} alt={`Serviço ${index + 1}`} />
-                        ))}
-                    </div>
-                </div>
-
-                {/* --- Avaliações (Avaliações) --- */}
-                <div className={`${styles.box} ${styles.avaliacoesBox}`}>
-                    <h2>Avaliações</h2>
-
-                    {/* Gráfico de Linhas (SVG) */}
-                    <div className={styles.graficoLinhas}>
-                        <svg width="100%" height="150" viewBox="0 0 320 125">
-                            <polyline
-                                points="10,120 60,80 110,90 160,40 210,70 260,30 310,50"
-                                fill="none"
-                                stroke="#1a06c9"
-                                strokeWidth="3"
-                            />
-                        </svg>
-                    </div>
-
-                    {/* Avaliações em 5 níveis */}
-                    <div className={styles.ratingsList}>
-                        {displayData.avaliacoes.map((rating) => (
-                            <div key={rating.estrelas} className={styles.ratingRow}>
-                                <span>{rating.estrelas} ★</span>
-                                {/* Combinação de classe estática (styles.bar) e dinâmica (styles.bar5) */}
-                                <div
-                                    className={`${styles.bar} ${styles[`bar${rating.estrelas}`]}`}
-                                    style={{ width: `${rating.percentual}%` }}
-                                ></div>
-                                <span>{rating.percentual}%</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                
             </div>
             
             <EditUserModal 

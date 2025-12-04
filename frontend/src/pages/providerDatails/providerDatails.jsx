@@ -2,18 +2,21 @@ import {useState, useEffect} from 'react';
 
 import styles from './providerDatails.module.css';
 import {FaUserCircle} from 'react-icons/fa';
-import ProviderBox from '../../components/providerBox/providerBox';
+import ProviderBox from '../../components/providerBox/providerBox'; // Import não utilizado, mas mantido
 import { useProviderContext } from '../../context/providerSelected';
 import { FaArrowLeft } from "react-icons/fa6";
 import { useNavigate } from 'react-router';
 import { useAuth } from '../../context/AuthContext';
 import UserServices from '../../services/user';
 import ProviderServices from '../../services/provider';
+import Maps from '../../utils/Maps';
 
+// --- Função Auxiliar de Imagem ---
 const getImageUrl = (url) => {
     if (!url) return '';
     if (url.startsWith('http') || url.startsWith('blob:')) return url;
     if (url.startsWith('/img') || url.startsWith('/assets')) return url;
+    // O backend-url deve ser revisado: 'https://back-end-servicosja-api.onrender.com'
     return `https://back-end-servicosja-api.onrender.com${url}`;
 };
 
@@ -39,9 +42,9 @@ const Gallery = ({ images, onImageSelect, selectedImage }) => {
             {/* Miniaturas da Galeria */}
             <div className={styles.thumbnailsContainer}>
                 {images.length === 0 && (
-                     <div style={{color: '#666', fontStyle: 'italic', padding: '10px', width: '100%', textAlign: 'center'}}>
+                   <div style={{color: '#666', fontStyle: 'italic', padding: '10px', width: '100%', textAlign: 'center'}}>
                         Sem fotos disponíveis.
-                     </div>
+                   </div>
                 )}
 
                 {/* Renderiza as miniaturas das imagens do usuário */}
@@ -59,19 +62,23 @@ const Gallery = ({ images, onImageSelect, selectedImage }) => {
     );
 };
 
+// --- COMPONENTE PRINCIPAL ---
 export default function ProviderDatails () {
     
+    // --- ESTADOS ---
     const [userGalleryImages, setUserGalleryImages] = useState([]);
     const [currentMainImage, setCurrentMainImage] = useState(null);
     const [comments, setComments] = useState([]);
     const [fullProviderData, setFullProviderData] = useState(null);
 
+    // --- CONTEXTOS E HOOKS ---
     const { providerSelected } = useProviderContext();
     const navigate = useNavigate();
     const { isAuthenticated, user } = useAuth();
     const { initiateContact, getClientSolicitations } = UserServices();
     const { getProviderPerfil } = ProviderServices();
 
+    // --- FUNÇÕES DE AUXÍLIO À RENDERIZAÇÃO ---
     const renderStars = (currentRating) => {
         const fullStars = Math.round(currentRating || 0);
         let stars = [];
@@ -83,14 +90,14 @@ export default function ProviderDatails () {
         return stars;
     };
     
-    // Fetch real provider data on load
+    // --- EFEITO DE BUSCA DE DADOS ---
     useEffect(() => {
         if (providerSelected?.id) {
             getProviderPerfil(providerSelected.id)
                 .then(data => {
                     setFullProviderData(data);
                     
-                    // Setup Portfolio
+                    // 1. Setup Portfolio
                     if (data.portfolio && Array.isArray(data.portfolio)) {
                         const formattedImages = data.portfolio.map(item => ({
                             id: item.id,
@@ -102,7 +109,7 @@ export default function ProviderDatails () {
                         }
                     }
 
-                    // Setup Comments
+                    // 2. Setup Comments
                     if (data.ultimas_avaliacoes && Array.isArray(data.ultimas_avaliacoes)) {
                         setComments(data.ultimas_avaliacoes);
                     }
@@ -117,6 +124,28 @@ export default function ProviderDatails () {
         setCurrentMainImage(url);
     };
 
+    // --- CORREÇÃO DO CÓDIGO DO MAPA (evitar NaN) ---
+    // Coordenadas padrão para evitar NaN se a API demorar ou retornar null
+    // Use coordenadas que façam sentido para a sua aplicação (Exemplo: Centro do Brasil ou área de serviço)
+    const DEFAULT_LAT = -15.7801; // Exemplo: Brasília, DF
+    const DEFAULT_LONG = -47.9292;
+
+    // Acessa os dados, usa ?? para garantir que é uma string ou 0 se for null/undefined,
+    // e usa o valor padrão se o resultado da conversão para Number for NaN.
+    // **Ajuste o nome das propriedades se houver inversão na sua API (latitude/longitude)**
+    // Mantendo a lógica de uso: latitude da API para lat, longitude da API para long.
+    const mapLatitude = Number(fullProviderData?.latitude ?? providerSelected?.latitude ?? 0) || DEFAULT_LAT;
+    const mapLongitude = Number(fullProviderData?.longitude ?? providerSelected?.longitude ?? 0) || DEFAULT_LONG;
+    
+    // Se a API estiver INVERTENDO OS NOMES (como no seu código original `latitude = longitude`):
+    // const mapLatitude = Number(fullProviderData?.longitude ?? providerSelected?.longitude ?? 0) || DEFAULT_LAT;
+    // const mapLongitude = Number(fullProviderData?.latitude ?? providerSelected?.latitude ?? 0) || DEFAULT_LONG;
+    // Utilizarei a forma padrão (latitude -> lat, longitude -> long) para esta correção,
+    // mas se o problema persistir, use as linhas comentadas acima.
+    
+    console.log(`Coordenadas do Mapa: Lat ${mapLatitude}, Long ${mapLongitude}`);
+    // ------------------------------------------------------------------
+
     const handleRequestService = async () => {
         if (!isAuthenticated) {
             navigate('/login');
@@ -129,47 +158,42 @@ export default function ProviderDatails () {
         }
 
         try {
-            // Need service ID. providerSelected.servico might be object or ID.
-            let serviceId = providerSelected.servico?.id || providerSelected.servico;
-            // Attempt to get user_id from various common property names
-            let providerUserId = providerSelected.user_id || providerSelected.user || providerSelected.userId;
+            // Usa o ID do prestador do fullProviderData, pois é o dado mais completo e atualizado
+            let providerUserId = fullProviderData?.user_id || providerSelected.user_id || providerSelected.user || providerSelected.userId;
+            
+            // Tenta obter o ID do serviço
+            let serviceId = fullProviderData?.servico?.id || fullProviderData?.servico || providerSelected.servico?.id || providerSelected.servico;
 
-            // Use fullProviderData if available to ensure correct IDs
-            if (fullProviderData) {
-                 if (fullProviderData.user_id) providerUserId = fullProviderData.user_id;
-                 if (fullProviderData.servico) serviceId = fullProviderData.servico.id || fullProviderData.servico;
+            
+            // Fallback se user_id ainda estiver faltando
+            if (!providerUserId) {
+                 // Esta lógica de fallback já estava no seu código, mantida por segurança.
+                 // Na maioria dos casos, fullProviderData já terá o ID correto.
+                 console.log("user_id missing in context, fetching profile...");
+                 const fullProfile = await getProviderPerfil(providerSelected.id);
+                 if (fullProfile && fullProfile.user_id) {
+                     providerUserId = fullProfile.user_id;
+                     if (!serviceId && fullProfile.servico) {
+                          serviceId = fullProfile.servico.id || fullProfile.servico;
+                     }
+                 } else {
+                     console.error("Could not retrieve user_id from profile details.");
+                     alert("Erro: Não foi possível identificar o prestador.");
+                     return;
+                 }
             }
 
-            console.log("Handle Request Service - Selected:", providerSelected);
-            console.log("Handle Request Service - Full Data:", fullProviderData);
-            
-            // Fallback if user_id missing
-            if (!providerUserId) {
-                console.log("user_id missing in context, fetching profile...");
-                try {
-                    const fullProfile = await getProviderPerfil(providerSelected.id);
-                    if (fullProfile && fullProfile.user_id) {
-                        providerUserId = fullProfile.user_id;
-                        if (!serviceId && fullProfile.servico) {
-                             serviceId = fullProfile.servico.id || fullProfile.servico;
-                        }
-                    } else {
-                        console.error("Could not retrieve user_id from profile details.");
-                        alert("Erro: Não foi possível identificar o prestador.");
-                        return;
-                    }
-                } catch (err) {
-                    console.error("Error fetching provider profile:", err);
-                    alert("Erro ao buscar dados do prestador.");
-                    return;
-                }
+            if (!providerUserId || !serviceId) {
+                console.error("Final IDs are missing:", { providerUserId, serviceId });
+                alert("Erro: Não foi possível identificar o prestador ou o serviço.");
+                return;
             }
 
             console.log("Handle Request Service - Final IDs:", { providerUserId, serviceId });
 
             // Check for pending evaluations
             const solicitations = await getClientSolicitations();
-            // Filter: same provider AND not evaluated
+            // Filtra: mesmo prestador E não avaliado
             const pending = solicitations.find(s => 
                 (s.prestador === providerUserId || s.prestador_id === providerUserId) && 
                 !s.avaliacao_realizada
@@ -184,10 +208,12 @@ export default function ProviderDatails () {
             if (result && result.whatsapp_url) {
                 window.open(result.whatsapp_url, '_blank');
             } else {
+                alert("O contato foi iniciado, mas não foi possível gerar o link do WhatsApp.");
                 console.error("No WhatsApp URL returned");
             }
         } catch (error) {
             console.error("Failed to initiate contact", error);
+            alert("Falha ao tentar iniciar o contato com o prestador.");
         }
     }
     
@@ -197,8 +223,8 @@ export default function ProviderDatails () {
     }
 
     const displayData = fullProviderData || providerSelected;
-    const notaMedia = displayData.nota_media !== undefined ? displayData.nota_media : (providerSelected.nota_media || 4.6);
-    // Nota: providerSelected.nota_media pode ser 0, então verifique undefined
+    // Garante que notaMedia é um número, com fallback para 0
+    const notaMedia = Number(displayData.nota_media) || Number(providerSelected.nota_media) || 0; 
 
     return(
         <div className={styles.providerDatailsContainer}>
@@ -208,12 +234,13 @@ export default function ProviderDatails () {
 
             <div className={styles.providerDatailsHome}>
                 <div className={styles.providerDatailsImage}>
+                    {/* Usa foto do fullProviderData ou perfilImg do providerSelected */}
                     <img src={getImageUrl(displayData.foto || displayData.perfilImg) || "/img/exemples/Group 8.png"} alt="Imagem do Prestador" />
                 </div>
 
                 <div className={styles.providerDatailsInfo}>
                     <h2>{displayData.nome}</h2>
-                    <h5>{displayData.servico?.nome || displayData.categoria}</h5>
+                    <h5>{displayData.servico?.nome || displayData.categoria || "Serviço Indefinido"}</h5>
                     <div className={styles.line}></div>
                     <p>{displayData.biografia || "Descrição detalhada do prestador de serviço, suas qualificações, experiência e outras informações relevantes que possam ajudar o cliente a tomar uma decisão informada."}</p>
                 </div>
@@ -222,7 +249,7 @@ export default function ProviderDatails () {
             <div className={styles.requestService}>
                {user?.tipo_usuario === 'prestador' ? (
                    <div style={{ textAlign: 'center', color: '#666', fontStyle: 'italic' }}>
-                       Prestadores não podem solicitar serviços.
+                        Prestadores não podem solicitar serviços.
                    </div>
                ) : (
                    <button onClick={handleRequestService} >Solicitar serviço</button>
@@ -246,6 +273,7 @@ export default function ProviderDatails () {
                     </div >
 
                     <div className={styles.comments}>
+                        <h3>Últimas Avaliações</h3>
                         {comments.length > 0 ? (
                             comments.map((comment, index) => (
                                 <div key={index} className={styles.commentUser} style={{alignItems: 'flex-start', flexDirection: 'column', gap: '5px'}}>
@@ -259,7 +287,6 @@ export default function ProviderDatails () {
                                 </div>
                             ))
                         ) : (
-                            // Fallback estático se não houver comentários (para manter o layout ou avisar)
                             <div style={{padding: '10px', color: '#666', textAlign: 'center', width: '100%'}}>
                                 Nenhuma avaliação recente.
                             </div>
@@ -275,6 +302,9 @@ export default function ProviderDatails () {
                     /> 
                 </div>
             </div>
+
+            {/* Componente Maps corrigido para receber números válidos */}
+            <Maps lat={mapLatitude} long={mapLongitude} />
 
         </div>
     )

@@ -8,6 +8,7 @@ import Footer from "./components/footer/footer"
 import Chatbot from "./components/chatbot/chatbot"
 import { ProviderProvider } from './context/providerSelected';
 import { AuthProvider } from './context/AuthContext';
+import 'leaflet/dist/leaflet.css';
 
 
 
